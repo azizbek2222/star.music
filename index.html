@@ -4,99 +4,156 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mini App Musiqa</title>
+<title>Musiqa Qidiruv</title>
 
 <!-- Telegram WebApp -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- AdsGram -->
+<!-- AdsGram Interstitial -->
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
 body {
-    background: #0d0d0d;
-    color: white;
     font-family: Arial;
+    background: #111;
+    color: white;
     padding: 20px;
 }
-.card {
-    background: #1c1c1c;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 12px;
+input {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 20px;
+    font-size: 17px;
 }
-.btn {
-    background: #0af;
-    padding: 8px 12px;
-    display: inline-block;
+.music-card {
+    background: #222;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.btn-download {
     margin-top: 10px;
-    border-radius: 8px;
+    display: inline-block;
+    padding: 8px 12px;
+    background: #0af;
     color: white;
+    border-radius: 8px;
+    text-decoration: none;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🎵 Mini App Musiqa</h2>
+<h2>Musiqa qidiruv 🎵</h2>
 
-<input type="text" id="search" placeholder="Musiqa qidirish..." style="width:100%;padding:12px;border-radius:10px;border:none;margin-bottom:20px;">
+<input type="text" id="search" placeholder="Musiqa nomini yozing...">
 
 <div id="musicList"></div>
 
 <script>
-// Telegram user ID olish (AdsGram uchun shart)
-const tg = window.Telegram.WebApp;
-const USER_ID = tg.initDataUnsafe?.user?.id || "guest";
-
-// AdsGram interstitial
-function showAd() {
-    const AdController = window.Adsgram.init({
-        blockId: "int-18073",  // BU YERGA O'ZINGNI BLOCK ID QO'YASAN
-        userId: USER_ID
-    });
-
-    AdController.show()
-    .then(res => console.log("Ad done:", res))
-    .catch(err => console.log("Ad error:", err));
-}
-
-// Musiqa ro‘yxati
-const music = [
-    {name: "Sonne", url: "link1"},
-    {name: "Gul yuzim", url: "link2"},
-    {name: "Ummon - Xiyonat", url: "link3"},
+// === MUSIQALAR RO‘YXATI ===
+const musics = [
+    {name: "VID_20251118_192030_261", link: "https://drive.google.com/file/d/1lit7mXNXePw_v60bPlrW7RflTwhttnZm/view?usp=drivesdk"},
+    {name: "gul yuzim alvido dedingda", link: "https://drive.google.com/file/d/1nkEsnXO1agZ-Cek-JBAqpErwIBfJoM5H/view?usp=drivesdk"},
+    {name: "farhana bass sirena", link: "https://drive.google.com/file/d/1GZqP9L1i2foawFdEQ98MaxYdxHLgGpt8/view?usp=drivesdk"},
+    {name: "Dokuko - Montagem Sombria Ultra Slowed", link: "https://drive.google.com/file/d/17GSiLBkVA0tzEJcKSI9IqZktVtQSSGOg/view?usp=drivesdk"},
+    {name: "Criztyian - Crystal Moet x Tneet (slowed+reverb+bass boost)", link: "https://drive.google.com/file/d/1tN5ZDXUGC2oYFAogmlsMOSJhh87ADEy_/view?usp=drivesdk"},
+    {name: "AUTOMOTIVO MAGICO WORLD (SLOWED)", link: "https://drive.google.com/file/d/11W8Xcijd_rwXMcE82nNYzM6WI9Q8JZnz/view?usp=drivesdk"},
+    {name: "top g slowed", link: "https://drive.google.com/file/d/1WKc84PTl1vq7ip8vkPPtI_lhRqN5LOnO/view?usp=drivesdk"},
+    {name: "07 LADA", link: "https://drive.google.com/file/d/1kmxwK--TKLcO1WCzFuIMvF6oLop8Bxfx/view?usp=drivesdk"},
+    {name: "Uzbek tahoe", link: "https://drive.google.com/file/d/1MMm6cWIxoHyENRp5m3lgkA1Lo5QCZ3Mb/view?usp=drivesdk"},
+    {name: "TRALALERO PORRADEIRO (Super Slowed)", link: "https://drive.google.com/file/d/1alWCBYHw7yBWFlHSnpVPPy-gjM7mNCFj/view?usp=drivesdk"},
+    {name: "Golden Brown (Slowed Down Version)", link: "https://drive.google.com/file/d/1ecd85RcmaxNS8UNuDD0bNmjIbg_Eb1IS/view?usp=drivesdk"},
+    {name: "Sonne", link: "https://drive.google.com/file/d/1OhdWfx1gkQ9Zxhumr_XoC2yqEOukwcgD/view?usp=drivesdk"},
+    {name: "SKORN - Slowed", link: "https://drive.google.com/file/d/1riucgmZqBfUgLyc6v25HgdJuSUCXlypw/view?usp=drivesdk"},
+    {name: "Гио_Пика_Черный_Дельфин_Slow", link: "https://drive.google.com/file/d/1DYNy-hJP24HySJjHLYjO3v53CAp-ewlz/view?usp=drivesdk"},
+    {name: "снова ноч", link: "https://drive.google.com/file/d/1GH5EU-Xc5OhHkFHq9DkXUm1Alic9e-4W/view?usp=drivesdk"},
+    {name: "Ummon - Xiyonat", link: "https://drive.google.com/file/d/1zl_tXGL9H1ixc7bTdsSlmNxxO-flHmYu/view?usp=drivesdk"},
+    {name: "deepdown_Andrew_Tate_Theme_Song_slowed", link: "https://drive.google.com/file/d/1u8fsCgXm8NbRO7lWDkCjOAKqMy2EbSBa/view?usp=drivesdk"},
+    {name: "18 yoshimda edi", link: "https://drive.google.com/file/d/1odZ5KT2TuNJAiuLmZHKHRlhY2A7GHCGn/view?usp=drivesdk"},
+    {name: "PAPI DE MI VIDA PAPI AMOR FUNK 2 (Ultra Slowed)", link: "https://drive.google.com/file/d/1VIp8Dbov40f3nfkxwjphEzSNpbGw3MH6/view?usp=drivesdk"},
 ];
 
-// Render
-function render(list) {
-    const box = document.getElementById("musicList");
-    box.innerHTML = "";
+// === INTERSTITIAL REKLAMA ===
+function showInterstitial() {
+    const AdController = window.Adsgram.init({
+        blockId: "int-18073", // sizning interstitial blockId
+        type: "interstitial"
+    });
 
-    list.forEach(m => {
-        box.innerHTML += `
-            <div class="card">
-                ${m.name}
-                <a class="btn" href="${m.url}" target="_blank">Yuklab olish</a>
-            </div>
-        `;
+    AdController.show().then((result) => {
+        console.log("Interstitial ad finished:", result);
+    }).catch((e) => {
+        console.log("Interstitial error:", e);
     });
 }
 
-render(music);
+// === AUTOSTART REKLAMA ===
+setTimeout(showInterstitial, 1200); // sahifa ochilgandan 1.2s keyin interstitial
 
-// Qidiruv + reklama
-let count = 0;
-document.getElementById("search").addEventListener("input", e => {
-    const val = e.target.value.toLowerCase();
-    const filtered = music.filter(m => m.name.toLowerCase().includes(val));
-    render(filtered);
+// === MUSIQA CHIQARISH ===
+function renderList(filtered) {
+    let list = document.getElementById("musicList");
+    list.innerHTML = "";
 
-    count++;
-    if (count >= 3) {
-        showAd();
-        count = 0;
-    }
+    filtered.forEach(m => {
+        let div = document.createElement("div");
+        div.className = "music-card";
+        div.innerHTML = `
+            ${m.name}<br>
+            <a class="btn-download" href="${m.link}" target="_blank">Yuklab olish ⬇</a>
+        `;
+        list.appendChild(div);
+    });
+
+    // === YUKLAB OLISH TUGMASI BOSILISHI HISOBLASH ===
+    let downloadButtons = document.querySelectorAll(".btn-download");
+    let downloadCount = 0;
+
+    downloadButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            downloadCount++;
+            console.log("Yuklab olish bosildi:", downloadCount);
+
+            if (downloadCount >= 5) {
+                showInterstitial(); // 5-marta bosilganda interstitial reklama
+                downloadCount = 0;
+            }
+        });
+    });
+}
+
+renderList(musics);
+
+// === QIDIRUV + AUTO REKLAMA 5-marta ===
+let searchCount = 0;
+let typingTimer;
+const doneTypingDelay = 1000;
+
+document.getElementById("search").addEventListener("input", function () {
+    clearTimeout(typingTimer);
+    const value = this.value.toLowerCase();
+
+    typingTimer = setTimeout(() => {
+        if (value === "") {
+            renderList(musics);
+            return;
+        }
+
+        const filtered = musics.filter(m => m.name.toLowerCase().includes(value));
+        renderList(filtered);
+
+        searchCount++;
+        console.log("Qidiruv soni:", searchCount);
+
+        if (searchCount >= 5) {
+            showInterstitial(); // interstitial reklama
+            searchCount = 0;
+        }
+    }, doneTypingDelay);
 });
 </script>
 
