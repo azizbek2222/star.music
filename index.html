@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Musiqa Qidiruv</title>
+
+<!-- Telegram WebApp -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- AdsGram Reward -->
+<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #111;
+    color: white;
+    padding: 20px;
+}
+input {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 20px;
+    font-size: 17px;
+}
+.music-card {
+    background: #222;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.btn-download {
+    margin-top: 10px;
+    display: inline-block;
+    padding: 8px 12px;
+    background: #0af;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Musiqa qidiruv 🎵</h2>
+
+<input type="text" id="search" placeholder="Musiqa nomini yozing...">
+
+<div id="musicList"></div>
+
+<script>
+// === MUSIQALAR RO‘YXATI ===
+const musics = [
+    {name: "gul yuzim alvido dedingda", link: "https://drive.google.com/file/d/1nkEsnXO1agZ-Cek-JBAqpErwIBfJoM5H/view?usp=drivesdk"},
+    {name: "farhana bass sirena", link: "https://drive.google.com/file/d/1GZqP9L1i2foawFdEQ98MaxYdxHLgGpt8/view?usp=drivesdk"},
+    {name: "Dokuko - Montagem Sombria Ultra Slowed", link: "https://drive.google.com/file/d/17GSiLBkVA0tzEJcKSI9IqZktVtQSSGOg/view?usp=drivesdk"},
+    {name: "Criztyian - Crystal Moet x Tneet (slowed+reverb+bass boost)", link: "https://drive.google.com/file/d/1tN5ZDXUGC2oYFAogmlsMOSJhh87ADEy_/view?usp=drivesdk"},
+    {name: "AUTOMOTIVO MAGICO WORLD (SLOWED)", link: "https://drive.google.com/file/d/11W8Xcijd_rwXMcE82nNYzM6WI9Q8JZnz/view?usp=drivesdk"},
+    {name: "top g slowed", link: "https://drive.google.com/file/d/1WKc84PTl1vq7ip8vkPPtI_lhRqN5LOnO/view?usp=drivesdk"},
+    {name: "07 LADA", link: "https://drive.google.com/file/d/1kmxwK--TKLcO1WCzFuIMvF6oLop8Bxfx/view?usp=drivesdk"},
+    {name: "Uzbek tahoe", link: "https://drive.google.com/file/d/1MMm6cWIxoHyENRp5m3lgkA1Lo5QCZ3Mb/view?usp=drivesdk"},
+    {name: "TRALALERO PORRADEIRO (Super Slowed)", link: "https://drive.google.com/file/d/1alWCBYHw7yBWFlHSnpVPPy-gjM7mNCFj/view?usp=drivesdk"},
+    {name: "Golden Brown (Slowed Down Version)", link: "https://drive.google.com/file/d/1ecd85RcmaxNS8UNuDD0bNmjIbg_Eb1IS/view?usp=drivesdk"},
+    {name: "Sonne", link: "https://drive.google.com/file/d/1OhdWfx1gkQ9Zxhumr_XoC2yqEOukwcgD/view?usp=drivesdk"},
+    {name: "SKORN - Slowed", link: "https://drive.google.com/file/d/1riucgmZqBfUgLyc6v25HgdJuSUCXlypw/view?usp=drivesdk"},
+    {name: "Гио_Пика_Черный_Дельфин_Slow", link: "https://drive.google.com/file/d/1DYNy-hJP24HySJjHLYjO3v53CAp-ewlz/view?usp=drivesdk"},
+    {name: "снова ноч", link: "https://drive.google.com/file/d/1GH5EU-Xc5OhHkFHq9DkXUm1Alic9e-4W/view?usp=drivesdk"},
+    {name: "Ummon - Xiyonat", link: "https://drive.google.com/file/d/1zl_tXGL9H1ixc7bTdsSlmNxxO-flHmYu/view?usp=drivesdk"},
+    {name: "deepdown_Andrew_Tate_Theme_Song_slowed", link: "https://drive.google.com/file/d/1u8fsCgXm8NbRO7lWDkCjOAKqMy2EbSBa/view?usp=drivesdk"},
+    {name: "18 yoshimda edi", link: "https://drive.google.com/file/d/1odZ5KT2TuNJAiuLmZHKHRlhY2A7GHCGn/view?usp=drivesdk"},
+    {name: "PAPI DE MI VIDA PAPI AMOR FUNK 2 (Ultra Slowed)", link: "https://drive.google.com/file/d/1VIp8Dbov40f3nfkxwjphEzSNpbGw3MH6/view?usp=drivesdk"},
+];
+
+// === REWARD REKLAMA ===
+function showReward() {
+    const AdController = window.Adsgram.init({
+        blockId: "18089" // sizning reward blockId
+    });
+
+    AdController.show().then((result) => {
+        console.log("Reward ad finished:", result);
+    }).catch((e) => {
+        console.log("Reward error:", e);
+    });
+}
+
+// === AUTOSTART REKLAMA ===
+setTimeout(showReward, 1200); // sahifa ochilgandan 1.2s keyin reklama
+
+// === MUSIQA CHIQARISH ===
+function renderList(filtered) {
+    let list = document.getElementById("musicList");
+    list.innerHTML = "";
+
+    filtered.forEach(m => {
+        let div = document.createElement("div");
+        div.className = "music-card";
+        div.innerHTML = `
+            ${m.name}<br>
+            <a class="btn-download" href="${m.link}" target="_blank">Yuklab olish ⬇</a>
+        `;
+        list.appendChild(div);
+    });
+}
+renderList(musics);
+
+// === QIDIRUV + AUTO REKLAMA 5-marta ===
+let searchCount = 0;
+let typingTimer;
+const doneTypingDelay = 1000; // foydalanuvchi yozishni to‘xtatgach 1s dan so‘ng
+
+document.getElementById("search").addEventListener("input", function () {
+    clearTimeout(typingTimer);
+    const value = this.value.toLowerCase();
+
+    typingTimer = setTimeout(() => {
+        if (value === "") {
+            renderList(musics);
+            return;
+        }
+
+        const filtered = musics.filter(m => m.name.toLowerCase().includes(value));
+        renderList(filtered);
+
+        // faqat yozish tugagach bitta qidiruv hisoblanadi
+        searchCount++;
+        console.log("Qidiruv soni:", searchCount);
+
+        if (searchCount >= 5) {
+            showReward();   // 5-marta reklama
+            searchCount = 0;
+        }
+    }, doneTypingDelay);
+});
+</script>
+
+</body>
+</html>
