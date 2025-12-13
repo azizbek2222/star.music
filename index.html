@@ -2,14 +2,12 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Musiqa Qidiruv</title>
 
-<!-- Telegram WebApp -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- AdsGram Interstitial -->
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
@@ -53,72 +51,32 @@ input {
 
 <div id="musicList"></div>
 
-<script>
-// === MUSIQALAR RO‘YXATI ===
-const musics = [
-    {name: "", link: ""},
-    {name: "Babel  Чёрный дельфин", link: "https://drive.google.com/file/d/1Y_Oa0e4vzbZ8NxqUD0GOWFY5eUqg6U6q/view?usp=drivesdk"},
-    {name: "Fidan Hacizade - Akuta menya akutala (super rus mahnisi)", link: "https://drive.google.com/file/d/1JZM0SXdcKaym1I-fL5YycTZ6CbdZDcib/view?usp=drivesdk"},
-    {name: "Kadrimdi Bilmedi", link: "https://drive.google.com/file/d/1Eax9s-1PCvSanlChRL5fllZ37Xu5ILeY/view?usp=drivesdk"},
-    {name: "Kechagina oqshomlari - Shohrux Ergashev", link: "https://drive.google.com/file/d/16RXB2J16FTKbyCiaqUO1D2xWSgj4uhyw/view?usp=drivesdk"},
-    {name: "Добрый Я (orginal)", link: "https://drive.google.com/file/d/1oYfnBU0vFP0kJlJr8cPalpTxhh3-ymFt/view?usp=drivesdk"},
-    {name: "Я не сука я вор", link: "https://drive.google.com/file/d/1Cnn4FRdggEiL4Dnj04GsohD9YSKJIcm9/view?usp=drivesdk"},
-    {name: "ACIDO III (Super Slowed)", link: "https://drive.google.com/file/d/1iRmkTi05whQI73Tf7HEcg5sstU6k6AdL/view?usp=drivesdk"},
-    {name: "tourner", link: "https://pixeldrain.com/u/r8xz4ivB"},
-    {name: "AUTOMOTIVO INFLAMAÇÃO 1.0 (SLOWED)", link: "https://drive.google.com/file/d/1Rjrl5oSe_Abb1HP0zdVOBTos41FBrLkL/view?usp=drivesdk"},
-    {name: "tourner dans le vide", link: "https://drive.google.com/file/d/1idYpCf8GF0WQhUlI9-kMIYXHVvHkZgXZ/view?usp=drivesdk"},
-    {name: "TOP G", link: "https://drive.google.com/file/d/1Clw_5WnadkWZzQMJH_RePmpdgDIW24_D/view?usp=drivesdk"},
-    {name: "Tipo Nino Vs Kabrinha", link: "https://drive.google.com/file/d/1FepPWok1d3V_bStYI6fZvk7AYYk0UQZx/view?usp=drivesdk"},
-    {name: "Scremteen_Айко_Slowed_Моя_Девочка_Айко", link: "https://drive.google.com/file/d/1NASe3yRRDmuBJR8L9NMhftOSyFGjZNiH/view?usp=drivesdk"},
-    {name: "Plain Jane | Remix", link: "https://drive.google.com/file/d/1NiuwBnUyLclXSYm_6wGuys2gYDOtRA8i/view?usp=drivesdk"},
-    {name: "Necessar", link: "https://drive.google.com/file/d/1iP40vSlqJXTOF4bVgubnmC3-j6JQGHVr/view?usp=drivesdk"},
-    {name: "Дом - Гио Пика", link: "https://drive.google.com/file/d/1RNTkMmCM3I5-ejID1Trmj6_lcDsfiahF/view?usp=drivesdk"},
-    {name: "MONTAGEM BRAVO - Slowed", link: "https://drive.google.com/file/d/1vvrVPu2R1atiqJ5_tw2bM9lpgrpDtwID/view?usp=drivesdk"},
-    {name: "slxughter - fragment (slowed)", link: "https://drive.google.com/file/d/11MqD-HFz3UWBdHA37oMOotE01HZ4OcIc/view?usp=drivesdk"},
-    {name: "KRAMBOSS - Topic - LUCIFER (SUPER SLOWED)", link: "https://drive.google.com/file/d/1LQ-bEplcbZjIamNC0GQALZxyWD41_rW1/view?usp=drivesdk"},
-    {name: "Life Letters", link: "https://drive.google.com/file/d/1WcLJ-WtdxnrkSSZLzSaHZAtbmAG2kDQY/view?usp=drivesdk"},
-    {name: "Cry", link: "https://drive.google.com/file/d/15lX0OICBj_sdEfgnfPPF8b77mcOyXKDV/view?usp=drivesdk"},
-    {name: "Отечество казённое", link: "https://drive.google.com/file/d/1aYYJDzC2m3K6KVq084OesNO0Tevycuy5/view?usp=drivesdk"},
-    {name: "Xizmatimda o sha boylar", link: "https://drive.google.com/file/d/1GP2Bndr3ZWH66zwS7yvGCdoXD2EqOXhn/view?usp=drivesdk"},
-    {name: "Janob Rasul - Sanam", link: "https://drive.google.com/file/d/12-9H4pb-ouS6cJD2fdzpouz-62DAY8Je/view?usp=drivesdk"},
-    {name: "Toʻyga chaqir boraman", link: "https://drive.google.com/file/d/1Fyjn0ZhiYLjHHWydkyP6Xh0ezGlO5UCk/view?usp=drivesdk"},
-    {name: "botir_xon_-_sotqin", link: "https://drive.google.com/file/d/17gHl3Yr0aFKs2p0uaoalQ11gRw5077rA/view?usp=drivesdk"},
-    {name: "Sevinch Mo minova va Vohidjon Isoqov - Sensiz", link: "https://drive.google.com/file/d/1Gth9VIr3LB6zq4LyKIXIRpuhlsBTQ-Sk/view?usp=drivesdk"},
-    {name: "All eyez on me", link: "https://drive.google.com/file/d/1SzgVbsqhRMqoY0lbSYtQ1S3AuHSYgkdX/view?usp=drivesdk"},
-    {name: "Gandagana - Reverb", link: "https://drive.google.com/file/d/1b94q9DOz_r11D_OSMDr4DvL-e1KcXUoY/view?usp=drivesdk"},
-    {name: "ᴊᴏɪɴ  sᴜʀxᴀɴ_ᴍᴜsɪᴄ", link: "https://drive.google.com/file/d/14ytJe6C_muzqldyeMHnhVulZGRg_dBx-/view?usp=drivesdk"},
-    {name: "tutur tutur tur", link: "https://drive.google.com/file/d/1C_6cz_ipf8WRvYKX7UoscDMOHm5TYxkh/view?usp=drivesdk"},
-    {name: "2pac", link: "https://drive.google.com/file/d/1DeSW-sHzSiCCB4fBvNlSW9sspB7NGBMU/view?usp=drivesdk"},
-    {name: "Montagem Supersonic", link: "https://drive.google.com/file/d/1-uQDJwunLKwoPGONz-RqVqVB016HazvE/view?usp=drivesdk"},
-    {name: "COLOCAD4O (ULTRA SLOWED)", link: "https://drive.google.com/file/d/1o0G55HOqij2o1t7yLcYAOyb2dOWNPq1M/view?usp=drivesdk"},
-    {name: "Frozen", link: "https://drive.google.com/file/d/1N9pft7fYuLSqi3KA_Cw06kBFAJVrkZRd/view?usp=drivesdk"},
-    {name: "Jahongir Ahadullayev   JAXAN", link: "https://drive.google.com/file/d/1rUm--Kwhha8DnZtXe8sCznG2Z3ntF6bk/view?usp=drivesdk"},
-    {name: "джаванна_", link: "https://drive.google.com/file/d/1w-YnVKTe5ZcujyNJ7KFd3FAVULKpwyJC/view?usp=drivesdk"},
-    {name: "VID_20251118_192030_261", link: "https://drive.google.com/file/d/1lit7mXNXePw_v60bPlrW7RflTwhttnZm/view?usp=drivesdk"},
-    {name: "gul yuzim alvido dedingda", link: "https://drive.google.com/file/d/1nkEsnXO1agZ-Cek-JBAqpErwIBfJoM5H/view?usp=drivesdk"},
-    {name: "farhana bass sirena", link: "https://drive.google.com/file/d/1GZqP9L1i2foawFdEQ98MaxYdxHLgGpt8/view?usp=drivesdk"},
-    {name: "Dokuko - Montagem Sombria Ultra Slowed", link: "https://drive.google.com/file/d/17GSiLBkVA0tzEJcKSI9IqZktVtQSSGOg/view?usp=drivesdk"},
-    {name: "Criztyian - Crystal Moet x Tneet (slowed+reverb+bass boost)", link: "https://drive.google.com/file/d/1tN5ZDXUGC2oYFAogmlsMOSJhh87ADEy_/view?usp=drivesdk"},
-    {name: "AUTOMOTIVO MAGICO WORLD (SLOWED)", link: "https://drive.google.com/file/d/11W8Xcijd_rwXMcE82nNYzM6WI9Q8JZnz/view?usp=drivesdk"},
-    {name: "top g slowed", link: "https://drive.google.com/file/d/1WKc84PTl1vq7ip8vkPPtI_lhRqN5LOnO/view?usp=drivesdk"},
-    {name: "07 LADA", link: "https://drive.google.com/file/d/1kmxwK--TKLcO1WCzFuIMvF6oLop8Bxfx/view?usp=drivesdk"},
-    {name: "Uzbek tahoe", link: "https://drive.google.com/file/d/1MMm6cWIxoHyENRp5m3lgkA1Lo5QCZ3Mb/view?usp=drivesdk"},
-    {name: "TRALALERO PORRADEIRO (Super Slowed)", link: "https://drive.google.com/file/d/1alWCBYHw7yBWFlHSnpVPPy-gjM7mNCFj/view?usp=drivesdk"},
-    {name: "Golden Brown (Slowed Down Version)", link: "https://drive.google.com/file/d/1ecd85RcmaxNS8UNuDD0bNmjIbg_Eb1IS/view?usp=drivesdk"},
-    {name: "Sonne", link: "https://drive.google.com/file/d/1OhdWfx1gkQ9Zxhumr_XoC2yqEOukwcgD/view?usp=drivesdk"},
-    {name: "SKORN - Slowed", link: "https://drive.google.com/file/d/1riucgmZqBfUgLyc6v25HgdJuSUCXlypw/view?usp=drivesdk"},
-    {name: "Гио_Пика_Черный_Дельфин_Slow", link: "https://drive.google.com/file/d/1DYNy-hJP24HySJjHLYjO3v53CAp-ewlz/view?usp=drivesdk"},
-    {name: "снова ноч", link: "https://drive.google.com/file/d/1GH5EU-Xc5OhHkFHq9DkXUm1Alic9e-4W/view?usp=drivesdk"},
-    {name: "Ummon - Xiyonat", link: "https://drive.google.com/file/d/1zl_tXGL9H1ixc7bTdsSlmNxxO-flHmYu/view?usp=drivesdk"},
-    {name: "deepdown_Andrew_Tate_Theme_Song_slowed", link: "https://drive.google.com/file/d/1u8fsCgXm8NbRO7lWDkCjOAKqMy2EbSBa/view?usp=drivesdk"},
-    {name: "18 yoshimda edi", link: "https://drive.google.com/file/d/1odZ5KT2TuNJAiuLmZHKHRlhY2A7GHCGn/view?usp=drivesdk"},
-    {name: "PAPI DE MI VIDA PAPI AMOR FUNK 2 (Ultra Slowed)", link: "https://drive.google.com/file/d/1VIp8Dbov40f3nfkxwjphEzSNpbGw3MH6/view?usp=drivesdk"},
-];
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-// === INTERSTITIAL REKLAMA ===
+<script>
+// === FIREBASE KONFIGURATSIYASI ===
+const firebaseConfig = {
+  apiKey: "AIzaSyApRt8MNq4YvsjxQVhyQK3p5km8G7Hi9iE",
+  authDomain: "webtelegram-9a1d6.firebaseapp.com",
+  // Realtime Database uchun 'databaseURL' ham kerak, agar u to'g'ri o'rnatilgan bo'lsa. 
+  // Agar o'rnatilmagan bo'lsa, avtomatik ravishda 'projectId' dan foydalanadi.
+  projectId: "webtelegram-9a1d6", 
+  storageBucket: "webtelegram-9a1d6.firebasestorage.app",
+  messagingSenderId: "991268167197",
+  appId: "1:991268167197:web:5a2b0ad266c20c6e00b0f4",
+  measurementId: "G-M7MR2JTT4L"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database(); // Realtime Database'ni chaqirish
+let musics = [];
+
+// === INTERSTITIAL REKLAMA (o'zgarmadi) ===
 function showInterstitial() {
     const AdController = window.Adsgram.init({
-        blockId: "int-18073", // sizning interstitial blockId
+        blockId: "int-18073", 
         type: "interstitial"
     });
 
@@ -129,13 +87,17 @@ function showInterstitial() {
     });
 }
 
-// === AUTOSTART REKLAMA ===
-setTimeout(showInterstitial, 1200); // sahifa ochilgandan 1.2s keyin interstitial
+setTimeout(showInterstitial, 1200);
 
-// === MUSIQA CHIQARISH ===
+// === MUSIQA CHIQARISH (o'zgarmadi) ===
 function renderList(filtered) {
     let list = document.getElementById("musicList");
     list.innerHTML = "";
+    
+    if (filtered.length === 0) {
+        list.innerHTML = "<p style='text-align: center; margin-top: 50px;'>Hech qanday musiqa topilmadi.</p>";
+        return;
+    }
 
     filtered.forEach(m => {
         let div = document.createElement("div");
@@ -147,7 +109,6 @@ function renderList(filtered) {
         list.appendChild(div);
     });
 
-    // === YUKLAB OLISH TUGMASI BOSILISHI HISOBLASH ===
     let downloadButtons = document.querySelectorAll(".btn-download");
     let downloadCount = 0;
 
@@ -157,16 +118,50 @@ function renderList(filtered) {
             console.log("Yuklab olish bosildi:", downloadCount);
 
             if (downloadCount >= 5) {
-                showInterstitial(); // 5-marta bosilganda interstitial reklama
+                showInterstitial(); 
                 downloadCount = 0;
             }
         });
     });
 }
 
-renderList(musics);
+// === MUSIQALARNI FIREBASE RTDB'DAN YUKLASH ===
+function loadMusics() {
+    const musicRef = db.ref('musics');
+    const musicListElement = document.getElementById("musicList");
+    musicListElement.innerHTML = "Yuklanmoqda...";
 
-// === QIDIRUV + AUTO REKLAMA 5-marta ===
+    // Ma'lumotlar o'zgarganda avtomatik yangilash (on - listener)
+    musicRef.on('value', (snapshot) => {
+        musics = [];
+        const data = snapshot.val();
+        
+        if (data) {
+            // RTDB datani object sifatida qaytaradi, uni massivga o'tkazamiz
+            Object.keys(data).forEach(key => {
+                musics.push({
+                    id: key, // RTDB da key (id) hash hisoblanadi
+                    name: data[key].name,
+                    link: data[key].link
+                });
+            });
+        }
+        
+        // Musiqalarni nom bo'yicha tartiblash
+        musics.sort((a, b) => a.name.localeCompare(b.name));
+        
+        renderList(musics);
+
+    }, (error) => {
+        console.error("Musiqalarni yuklashda xatolik:", error);
+        musicListElement.innerHTML = "<p style='color: red; text-align: center;'>Musiqalarni yuklashda xatolik yuz berdi.</p>";
+    });
+}
+
+// Sahifa yuklanganda musiqalarni yuklash
+document.addEventListener("DOMContentLoaded", loadMusics);
+
+// === QIDIRUV + AUTO REKLAMA 5-marta (o'zgarmadi) ===
 let searchCount = 0;
 let typingTimer;
 const doneTypingDelay = 1000;
@@ -176,20 +171,22 @@ document.getElementById("search").addEventListener("input", function () {
     const value = this.value.toLowerCase();
 
     typingTimer = setTimeout(() => {
-        if (value === "") {
-            renderList(musics);
-            return;
-        }
+        if (musics.length > 0) {
+            if (value === "") {
+                renderList(musics);
+                return;
+            }
+            
+            const filtered = musics.filter(m => m.name.toLowerCase().includes(value));
+            renderList(filtered);
 
-        const filtered = musics.filter(m => m.name.toLowerCase().includes(value));
-        renderList(filtered);
+            searchCount++;
+            console.log("Qidiruv soni:", searchCount);
 
-        searchCount++;
-        console.log("Qidiruv soni:", searchCount);
-
-        if (searchCount >= 5) {
-            showInterstitial(); // interstitial reklama
-            searchCount = 0;
+            if (searchCount >= 5) {
+                showInterstitial(); 
+                searchCount = 0;
+            }
         }
     }, doneTypingDelay);
 });
