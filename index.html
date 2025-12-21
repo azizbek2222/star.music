@@ -10,83 +10,48 @@
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
-body {
-    font-family: Arial;
-    background: #111;
-    color: white;
-    padding: 20px;
-}
-input {
-    width: 100%;
-    padding: 13px;
-    border-radius: 10px;
-    border: none;
-    margin-bottom: 20px;
-    font-size: 17px;
-}
-.music-card {
-    background: #222;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    overflow-wrap: break-word; 
-    word-break: break-word;
-}
-.btn-download {
-    margin-top: 10px;
-    display: inline-block;
-    padding: 8px 12px;
-    background: #0af;
-    color: white;
-    border-radius: 8px;
-    text-decoration: none;
-}
+body { font-family: Arial; background: #111; color: white; padding: 20px; }
+input { width: 100%; padding: 13px; border-radius: 10px; border: none; margin-bottom: 20px; font-size: 17px; }
+.music-card { background: #222; padding: 15px; border-radius: 10px; margin-bottom: 10px; overflow-wrap: break-word; word-break: break-word; }
+.btn-download { margin-top: 10px; display: inline-block; padding: 8px 12px; background: #0af; color: white; border-radius: 8px; text-decoration: none; }
 </style>
 </head>
 
 <body>
 
 <h2>Musiqa qidiruv 🎵</h2>
-
 <input type="text" id="search" placeholder="Musiqa nomini yozing...">
-
 <div id="musicList"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <script>
-// === BOUNTYHASH USULI: SESSİYANI SAQLASH VA TIKLASH ===
+// === REKLAMANI "MAJBURIY" ISHLATISH LOGIKASI ===
 (function() {
-    const STORAGE_KEY = 'tg_session_data';
+    const STORAGE_KEY = 'tg_init_data_v2';
     
-    // 1. URL'dan ma'lumotni tekshirish (#tgWebAppData=...)
+    // URL dan yoki xotiradan ma'lumotni olish
     const urlParams = new URLSearchParams(window.location.hash.replace('#', '?'));
-    const tgDataFromUrl = urlParams.get('tgWebAppData');
+    let tgData = urlParams.get('tgWebAppData') || localStorage.getItem(STORAGE_KEY);
 
-    if (tgDataFromUrl) {
-        // Agar botdan kirgan bo'lsa, ma'lumotni xotiraga saqlaymiz
-        localStorage.setItem(STORAGE_KEY, tgDataFromUrl);
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.initData = tgDataFromUrl;
+    if (tgData) {
+        localStorage.setItem(STORAGE_KEY, tgData);
+        
+        // Telegram obyektini majburiy to'ldirish
+        if (!window.Telegram) window.Telegram = {};
+        if (!window.Telegram.WebApp) window.Telegram.WebApp = {};
+        
+        window.Telegram.WebApp.initData = tgData;
+        window.Telegram.WebApp.platform = 'weba'; // Brauzerni Telegram Web kabi ko'rsatish
+        
+        if (typeof window.Telegram.WebApp.ready === 'function') {
+            window.Telegram.WebApp.ready();
         }
-        console.log("Yangi sessiya saqlandi.");
-    } else {
-        // Agar brauzerda ochilsa, xotiradagi eski ma'lumotni tiklaymiz
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData && window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.initData = savedData;
-            console.log("Eski sessiya xotiradan tiklandi. Reklama chiqishi mumkin.");
-        }
-    }
-    
-    // Telegram SDK'ni tayyorlash
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.ready();
     }
 })();
 
-// === FIREBASE KONFIGURATSIYASI ===
+// === FIREBASE ===
 const firebaseConfig = {
   apiKey: "AIzaSyApRt8MNq4YvsjxQVhyQK3p5km8G7Hi9iE",
   authDomain: "webtelegram-9a1d6.firebaseapp.com",
@@ -101,67 +66,51 @@ const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database(); 
 let musics = [];
 
-// === REKLAMA KO'RSATISH FUNKSIYASI ===
+// === REKLAMA FUNKSIYASI ===
 function showInterstitial() {
     if (window.Adsgram) {
+        console.log("Reklama so'ralmoqda...");
         const AdController = window.Adsgram.init({
             blockId: "int-18073", 
             type: "interstitial",
-            debug: false // Haqiqiy reklama uchun false
+            debug: false 
         });
 
-        AdController.show().then((result) => {
-            console.log("Reklama ko'rsatildi:", result);
-        }).catch((e) => {
-            console.error("AdsGram xatosi:", e);
-        });
+        AdController.show()
+            .then((result) => console.log("Muvaffaqiyat:", result))
+            .catch((e) => {
+                console.error("AdsGram xatosi:", e);
+                // Agar brauzerda chiqmasa, foydalanuvchini botga yo'naltirishni maslahat beramiz
+            });
     }
 }
 
-// Sahifa ochilganda reklama yuklashga urinish
-setTimeout(showInterstitial, 1500);
+// Sahifa yuklanganda 2 soniyadan keyin reklama
+setTimeout(showInterstitial, 2000);
 
-// === MUSIQA CHIQARISH ===
+// === MUSIQA LOGIKASI ===
 function renderList(filtered) {
     let list = document.getElementById("musicList");
     list.innerHTML = "";
-    
-    if (filtered.length === 0) {
-        list.innerHTML = "<p style='text-align: center; margin-top: 50px;'>Hech qanday musiqa topilmadi.</p>";
-        return;
-    }
-
     filtered.forEach(m => {
         let div = document.createElement("div");
         div.className = "music-card";
-        div.innerHTML = `
-            ${m.name}<br>
-            <a class="btn-download" href="${m.link}" target="_blank">Yuklab olish ⬇</a>
-        `;
+        div.innerHTML = `${m.name}<br><a class="btn-download" href="${m.link}" target="_blank">Yuklab olish ⬇</a>`;
         list.appendChild(div);
     });
 
     let downloadButtons = document.querySelectorAll(".btn-download");
     let downloadCount = 0;
-
     downloadButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             downloadCount++;
-            if (downloadCount >= 5) {
-                showInterstitial(); 
-                downloadCount = 0;
-            }
+            if (downloadCount >= 5) { showInterstitial(); downloadCount = 0; }
         });
     });
 }
 
-// === FIREBASE'DAN YUKLASH ===
 function loadMusics() {
-    const musicRef = db.ref('musics');
-    const musicListElement = document.getElementById("musicList");
-    musicListElement.innerHTML = "Yuklanmoqda...";
-
-    musicRef.on('value', (snapshot) => {
+    db.ref('musics').on('value', (snapshot) => {
         musics = [];
         const data = snapshot.val();
         if (data) {
@@ -171,28 +120,21 @@ function loadMusics() {
         }
         musics.sort((a, b) => a.name.localeCompare(b.name));
         renderList(musics);
-    }, (error) => {
-        musicListElement.innerHTML = "<p>Xatolik yuz berdi.</p>";
     });
 }
 
 document.addEventListener("DOMContentLoaded", loadMusics);
 
-// === QIDIRUV + AUTO REKLAMA ===
 let searchCount = 0;
 let typingTimer;
 document.getElementById("search").addEventListener("input", function () {
     clearTimeout(typingTimer);
-    const value = this.value.toLowerCase();
-
     typingTimer = setTimeout(() => {
+        const value = this.value.toLowerCase();
         const filtered = musics.filter(m => m.name.toLowerCase().includes(value));
         renderList(filtered);
         searchCount++;
-        if (searchCount >= 5) {
-            showInterstitial(); 
-            searchCount = 0;
-        }
+        if (searchCount >= 5) { showInterstitial(); searchCount = 0; }
     }, 1000);
 });
 </script>
