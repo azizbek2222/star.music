@@ -7,7 +7,6 @@
 <title>Musiqa Qidiruv</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
@@ -30,7 +29,6 @@ input {
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 10px;
-    /* YANGILANGAN QISMI: Musiqa nomi uzun bo'lsa pastga tushishi uchun */
     overflow-wrap: break-word; 
     word-break: break-word;
 }
@@ -58,12 +56,22 @@ input {
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <script>
+// === BRAUZERDA REKLAMA ISHLASHI UCHUN LOGIKA ===
+// Bu qism URL dagi #tgWebAppData ni o'qib, Telegram WebApp obyektiga yuklaydi
+(function() {
+    const urlParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+    const tgData = urlParams.get('tgWebAppData');
+    if (tgData && window.Telegram && window.Telegram.WebApp) {
+        // AdsGram SDK mana shu initData ni qidiradi
+        window.Telegram.WebApp.initData = tgData;
+        console.log("Telegram initData brauzerga muvaffaqiyatli yuklandi.");
+    }
+})();
+
 // === FIREBASE KONFIGURATSIYASI ===
 const firebaseConfig = {
   apiKey: "AIzaSyApRt8MNq4YvsjxQVhyQK3p5km8G7Hi9iE",
   authDomain: "webtelegram-9a1d6.firebaseapp.com",
-  // Realtime Database uchun 'databaseURL' ham kerak, agar u to'g'ri o'rnatilgan bo'lsa. 
-  // Agar o'rnatilmagan bo'lsa, avtomatik ravishda 'projectId' dan foydalanadi.
   projectId: "webtelegram-9a1d6", 
   storageBucket: "webtelegram-9a1d6.firebasestorage.app",
   messagingSenderId: "991268167197",
@@ -73,11 +81,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.database(); // Realtime Database'ni chaqirish
+const db = firebase.database(); 
 let musics = [];
 
-// === INTERSTITIAL REKLAMA (o'zgarmadi) ===
+// === INTERSTITIAL REKLAMA ===
 function showInterstitial() {
+    // AdsGram initialization
     const AdController = window.Adsgram.init({
         blockId: "int-18073", 
         type: "interstitial"
@@ -86,13 +95,14 @@ function showInterstitial() {
     AdController.show().then((result) => {
         console.log("Interstitial ad finished:", result);
     }).catch((e) => {
-        console.log("Interstitial error:", e);
+        console.error("AdsGram Error:", e);
     });
 }
 
+// Sahifa ochilganda reklama (faqat initData bo'lsa ishlaydi)
 setTimeout(showInterstitial, 1200);
 
-// === MUSIQA CHIQARISH (o'zgarmadi) ===
+// === MUSIQA CHIQARISH ===
 function renderList(filtered) {
     let list = document.getElementById("musicList");
     list.innerHTML = "";
@@ -118,8 +128,6 @@ function renderList(filtered) {
     downloadButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             downloadCount++;
-            console.log("Yuklab olish bosildi:", downloadCount);
-
             if (downloadCount >= 5) {
                 showInterstitial(); 
                 downloadCount = 0;
@@ -128,31 +136,27 @@ function renderList(filtered) {
     });
 }
 
-// === MUSIQALARNI FIREBASE RTDB'DAN YUKLASH (o'zgarmadi) ===
+// === MUSIQALARNI FIREBASE RTDB'DAN YUKLASH ===
 function loadMusics() {
     const musicRef = db.ref('musics');
     const musicListElement = document.getElementById("musicList");
     musicListElement.innerHTML = "Yuklanmoqda...";
 
-    // Ma'lumotlar o'zgarganda avtomatik yangilash (on - listener)
     musicRef.on('value', (snapshot) => {
         musics = [];
         const data = snapshot.val();
         
         if (data) {
-            // RTDB datani object sifatida qaytaradi, uni massivga o'tkazamiz
             Object.keys(data).forEach(key => {
                 musics.push({
-                    id: key, // RTDB da key (id) hash hisoblanadi
+                    id: key,
                     name: data[key].name,
                     link: data[key].link
                 });
             });
         }
         
-        // Musiqalarni nom bo'yicha tartiblash
         musics.sort((a, b) => a.name.localeCompare(b.name));
-        
         renderList(musics);
 
     }, (error) => {
@@ -161,10 +165,9 @@ function loadMusics() {
     });
 }
 
-// Sahifa yuklanganda musiqalarni yuklash
 document.addEventListener("DOMContentLoaded", loadMusics);
 
-// === QIDIRUV + AUTO REKLAMA 5-marta (o'zgarmadi) ===
+// === QIDIRUV + AUTO REKLAMA ===
 let searchCount = 0;
 let typingTimer;
 const doneTypingDelay = 1000;
@@ -184,8 +187,6 @@ document.getElementById("search").addEventListener("input", function () {
             renderList(filtered);
 
             searchCount++;
-            console.log("Qidiruv soni:", searchCount);
-
             if (searchCount >= 5) {
                 showInterstitial(); 
                 searchCount = 0;
