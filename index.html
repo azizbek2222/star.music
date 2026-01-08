@@ -9,23 +9,25 @@
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
 
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', () => {
-        const adexiumWidget = new AdexiumWidget({wid: 'c1da7d1d-1a8c-4fcc-9996-83bfd7b21c24', adFormat: 'interstitial'});
-        adexiumWidget.autoMode();
+        // 1. Interstitial reklama (avtomatik)
+        const adexiumInterstitial = new AdexiumWidget({
+            wid: 'c1da7d1d-1a8c-4fcc-9996-83bfd7b21c24', 
+            adFormat: 'interstitial'
+        });
+        adexiumInterstitial.autoMode();
+
+        // 2. Push-like reklama (avtomatik)
+        const adexiumPush = new AdexiumWidget({
+            wid: 'fbac6f05-0e1d-4a7d-a9b2-5e9f3c09b021', 
+            adFormat: 'push-like'
+        });
+        adexiumPush.autoMode();
     });
 </script>
-    
-    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            const adexiumWidget = new AdexiumWidget({
-                wid: 'fbac6f05-0e1d-4a7d-a9b2-5e9f3c09b021', 
-                adFormat: 'push-like'
-            });
-            adexiumWidget.autoMode();
-        });
-    </script>
+
 
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
