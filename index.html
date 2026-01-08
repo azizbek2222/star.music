@@ -31,6 +31,30 @@
 
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
+     <script>
+// Sizning mavjud Firebase va qidiruv logikangizdan keyin, mana bu yerga:
+
+document.addEventListener('DOMContentLoaded', () => {
+    // AdsGramni yuklash
+    // DIQQAT: blockId: "int-18073" ekanligini tekshiring
+    const AdController = window.Adsgram.init({ 
+        blockId: "int-20781", 
+        debug: false 
+    });
+
+    // Sahifa ochilgandan 1 soniya o'tgach avtomatik reklama chiqarish
+    setTimeout(() => {
+        AdController.show()
+            .then((result) => {
+                console.log("AdsGram avtomatik ko'rsatildi", result);
+            })
+            .catch((e) => {
+                console.error("AdsGram ko'rsatishda xatolik (balki reklama bloklangandir):", e);
+            });
+    }, 1000); 
+});
+</script>
+
     <style>
         body { font-family: Arial; background: #111; color: white; padding: 20px; }
         input { width: 100%; padding: 13px; border-radius: 10px; border: none; margin-bottom: 20px; font-size: 17px; color: #000; }
