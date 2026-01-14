@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta name="google-site-verification" content="g3wuBCS118ipXpmUl4hwAlVWPoBHbYshz4nYHoHPT30" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Musiqa Qidiruv</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const adexiumInterstitial = new AdexiumWidget({
+                wid: 'c1da7d1d-1a8c-4fcc-9996-83bfd7b21c24', 
+                adFormat: 'interstitial'
+            });
+            adexiumInterstitial.autoMode();
+
+            const adexiumPush = new AdexiumWidget({
+                wid: 'fbac6f05-0e1d-4a7d-a9b2-5e9f3c09b021', 
+                adFormat: 'push-like'
+            });
+            adexiumPush.autoMode();
+        });
+    </script>
+
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const AdController = window.Adsgram.init({ 
+            blockId: "int-20781", 
+            debug: false 
+        });
+
+        setTimeout(() => {
+            AdController.show()
+                .then((result) => { console.log("AdsGram avtomatik ko'rsatildi", result); })
+                .catch((e) => { console.error("AdsGram ko'rsatishda xatolik:", e); });
+        }, 1000); 
+    });
+    </script>
+
+    <style>
+        body { font-family: Arial; background: #111; color: white; padding: 20px; }
+        input { width: 100%; padding: 13px; border-radius: 10px; border: none; margin-bottom: 20px; font-size: 17px; color: #000; }
+        .music-card { background: #222; padding: 15px; border-radius: 10px; margin-bottom: 15px; overflow-wrap: break-word; word-break: break-word; }
+        .music-name { font-weight: bold; margin-bottom: 10px; display: block; font-size: 18px; }
+        audio { width: 100%; height: 35px; margin-top: 10px; filter: invert(100%); }
+        .btn-download { 
+            margin-top: 12px; display: inline-block; padding: 10px 15px; background: #0af; color: white; 
+            border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: bold; text-align: center; width: 100%; box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Musiqa qidiruv 🎵</h2>
+<input type="text" id="search" placeholder="Musiqa nomini yozing...">
+<div id="musicList"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<script>
+// === FOYDALANUVCHI MA'LUMOTLARINI BOSHQARISH (BountyHash Usuli) ===
+(function() {
+    if (!window.Telegram) window.Telegram = {};
+    if (!window.Telegram.WebApp) window.Telegram.WebApp = {};
+
+    // 1. Agar bot ichida bo'lsa, haqiqiy hashni saqlab qo'yamiz
+    if (window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.includes('hash=')) {
+        localStorage.setItem('real_tg_data', window.Telegram.WebApp.initData);
+    }
+
+    // 2. Agar brauzerda bo'lsa, saqlangan hashni qayta tiklaymiz
+    if (!window.Telegram.WebApp.initData) {
+        const savedData = localStorage.getItem('real_tg_data');
+        if (savedData) {
+            window.Telegram.WebApp.initData = savedData;
+        } else {
+            // Hash yo'q bo'lsa, guest simulyatsiyasi
+            let guestId = localStorage.getItem('guest_id') || Math.floor(Math.random() * 1000000000);
+            localStorage.setItem('guest_id', guestId);
+            const userJSON = JSON.stringify({id: parseInt(guestId), first_name: "Guest"});
+            window.Telegram.WebApp.initData = `user=${encodeURIComponent(userJSON)}&auth_date=${Math.floor(Date.now()/1000)}&hash=dummy_hash`;
+        }
+    }
+    
+    window.Telegram.WebApp.platform = 'android'; 
+    if (typeof window.Telegram.WebApp.ready === 'function') window.Telegram.WebApp.ready();
+})();
+
+// === FIREBASE KONFIGURATSIYASI ===
+const firebaseConfig = {
+  apiKey: "AIzaSyApRt8MNq4YvsjxQVhyQK3p5km8G7Hi9iE",
+  authDomain: "webtelegram-9a1d6.firebaseapp.com",
+  projectId: "webtelegram-9a1d6", 
+  storageBucket: "webtelegram-9a1d6.firebasestorage.app",
+  messagingSenderId: "991268167197",
+  appId: "1:991268167197:web:5a2b0ad266c20c6e00b0f4",
+  measurementId: "G-M7MR2JTT4L"
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database(); 
+let musics = [];
+
+// === REKLAMA FUNKSIYASI (AdsGram) ===
+function showInterstitial() {
+    if (window.Adsgram) {
+        const AdController = window.Adsgram.init({
+            blockId: "int-18073", 
+            type: "interstitial",
+            debug: false 
+        });
+
+        AdController.show()
+            .then((result) => console.log("AdsGram ko'rsatildi:", result))
+            .catch((e) => console.log("AdsGram xatosi:", e));
+    }
+}
+
+// === MUSIQA LOGIKASI ===
+function renderList(filtered) {
+    let list = document.getElementById("musicList");
+    list.innerHTML = "";
+    filtered.forEach(m => {
+        let div = document.createElement("div");
+        div.className = "music-card";
+        div.innerHTML = `
+            <span class="music-name">${m.name}</span>
+            <audio controls preload="none">
+                <source src="${m.link}" type="audio/mpeg">
+            </audio>
+            <a class="btn-download" href="${m.link}" download="${m.name}.mp3">Yuklab olish ⬇</a>
+        `;
+        list.appendChild(div);
+    });
+
+    let downloadButtons = document.querySelectorAll(".btn-download");
+    let downloadCount = 0;
+    downloadButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            downloadCount++;
+            if (downloadCount >= 5) {
+                showInterstitial(); 
+                downloadCount = 0;
+            }
+        });
+    });
+}
+
+function loadMusics() {
+    db.ref('musics').on('value', (snapshot) => {
+        musics = [];
+        const data = snapshot.val();
+        if (data) {
+            Object.keys(data).forEach(key => {
+                musics.push({ id: key, name: data[key].name, link: data[key].link });
+            });
+        }
+        musics.sort((a, b) => a.name.localeCompare(b.name));
+        renderList(musics);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", loadMusics);
+
+let searchCount = 0;
+let typingTimer;
+document.getElementById("search").addEventListener("input", function () {
+    clearTimeout(typingTimer);
+    const value = this.value.toLowerCase();
+    
+    typingTimer = setTimeout(() => {
+        const filtered = musics.filter(m => m.name.toLowerCase().includes(value));
+        renderList(filtered);
+        
+        searchCount++;
+        if (searchCount >= 5) {
+            showInterstitial();
+            searchCount = 0;
+        }
+    }, 1000);
+});
+</script>
+</body>
+</html>
